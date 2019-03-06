@@ -27,6 +27,10 @@ public class DriverDTO {
 	public int getOperNbr() {
 		return operNbr;
 	}
+	
+	public void setOper_nbr(int operNbr) {
+		this.operNbr = operNbr;
+	}
 
 	public String getCarrierCd() {
 		return carrierCd;
@@ -34,6 +38,10 @@ public class DriverDTO {
 
 	public String getLastName() {
 		return lastName;
+	}
+
+	public void setLast_name(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getFirstName() {
