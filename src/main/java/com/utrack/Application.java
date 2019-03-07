@@ -1,16 +1,19 @@
 package com.utrack;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
-
-import com.utrack.dto.Response;
-import com.utrack.service.DriverService;
 
 @Configuration
 @PropertySource({ "classpath:application.properties" })
@@ -26,23 +29,43 @@ public class Application {
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
-		ApplicationContext context = new AnnotationConfigApplicationContext("com.utrack.config");
-		DriverService driverService = context.getBean(DriverService.class);
-		driverService.findById(1);
+		ApplicationContext context = new AnnotationConfigApplicationContext(Application.class);
+		Application p = context.getBean(Application.class);
+		p.start();
 	}
 
 	public void start() {
-		Response driverDto = restTemplate.getForObject(restAPIUrl, Response.class);
-		System.out.println(driverDto.getResults().size());
+
+		String driverDto = restTemplate.exchange(restAPIUrl, HttpMethod.GET, null, String.class).getBody();
+		if (arquivoExiste() && (arquivoParaComparar(driverDto))) {
+			System.out.println("igual" + arquivoParaComparar(driverDto));
+		}
 	}
 
-	@Bean
-	public RestTemplate customRestTemplate() {
-		HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-		httpRequestFactory.setConnectionRequestTimeout(time);
-		httpRequestFactory.setConnectTimeout(3);
-		httpRequestFactory.setReadTimeout(3);
-
-		return new RestTemplate(httpRequestFactory);
+	public boolean arquivoExiste() {
+		return Files.exists(Paths.get("data.json"));
 	}
+
+	public boolean arquivoParaComparar(String arquivo) {
+		String infos = null;
+		try {
+			infos = new String(Files.readAllBytes(Paths.get("data.json")), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return DigestUtils.md5Hex(infos).equals(DigestUtils.md5Hex(arquivo));
+	}
+
+	public void escreverArquivo(String infos) {
+		try {
+			FileWriter fileWriter = new FileWriter("data.json");
+			fileWriter.write(infos);
+			fileWriter.flush();
+			fileWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 }
