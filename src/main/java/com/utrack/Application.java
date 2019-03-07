@@ -1,27 +1,20 @@
 package com.utrack;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import com.utrack.dto.Response;
-import com.utrack.repository.DriverRepository;
 import com.utrack.service.DriverService;
 
 @Configuration
 @PropertySource({ "classpath:application.properties" })
-@ComponentScan(basePackages = { "com.utrack" })
 public class Application {
-
-	@Autowired
-	DriverRepository driverRepo;
 
 	@Value("${restapi.url}")
 	private String restAPIUrl;
@@ -33,9 +26,9 @@ public class Application {
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
-		ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+		ApplicationContext context = new AnnotationConfigApplicationContext("com.utrack.config");
 		DriverService driverService = context.getBean(DriverService.class);
-		driverService.test();
+		driverService.findById(1);
 	}
 
 	public void start() {
