@@ -15,6 +15,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.gson.Gson;
+import com.utrack.config.AppConfig;
+import com.utrack.dto.Response;
 @Configuration
 @PropertySource({ "classpath:application.properties" })
 public class Application {
@@ -29,7 +32,7 @@ public class Application {
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
-		ApplicationContext context = new AnnotationConfigApplicationContext(Application.class);
+		ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 		Application p = context.getBean(Application.class);
 		p.start();
 	}
@@ -37,9 +40,12 @@ public class Application {
 	public void start() {
 
 		String driverDto = restTemplate.exchange(restAPIUrl, HttpMethod.GET, null, String.class).getBody();
-		if (arquivoExiste() && (arquivoParaComparar(driverDto))) {
+		Response response = response(driverDto);
+	;
+		System.out.println(response.getResults().size());
+		/*if (arquivoExiste() && (arquivoParaComparar(driverDto))) {
 			System.out.println("igual" + arquivoParaComparar(driverDto));
-		}
+		}*/
 	}
 
 	public boolean arquivoExiste() {
@@ -66,6 +72,11 @@ public class Application {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public Response response(String value) {
+		Gson gson = new Gson();
+		return gson.fromJson(value, Response.class);
 	}
 
 }

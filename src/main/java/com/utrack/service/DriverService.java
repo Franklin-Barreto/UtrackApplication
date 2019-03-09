@@ -10,10 +10,10 @@ import com.utrack.repository.DriverRepository;
 public class DriverService {
 
 	@Autowired
-	private DriverRepository driverRepo;
+	private DriverRepository driverRepository;
 
 	public Driver findById(Integer id) {
 		System.out.println("TESTE");
-		return driverRepo.findOne(id);
+		return driverRepository.findOne(id);
 	}
 }
